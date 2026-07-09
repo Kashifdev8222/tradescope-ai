@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as adminService from './admin.service.js';
+import { supabaseAdmin } from '../../config/supabase.js';
 
 // --- User Management ---
 
@@ -214,5 +215,124 @@ export async function getAuditLog(req: Request, res: Response) {
     res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(500).json({ success: false, error: { code: 'FETCH_FAILED', message: err.message } });
+  }
+}
+
+// --- RBAC ---
+export async function listRoles(req: Request, res: Response) {
+  try {
+    const { data, error } = await supabaseAdmin.from('roles').select('*, permissions:role_permissions(permission_id)').order('created_at');
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: { code: 'FETCH_FAILED', message: err.message } });
+  }
+}
+
+export async function listPermissions(req: Request, res: Response) {
+  try {
+    const { data, error } = await supabaseAdmin.from('permissions').select('*').order('category').order('name');
+    if (error) throw error;
+    res.json({ success: true, data: data || [] });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: { code: 'FETCH_FAILED', message: err.message } });
+  }
+}
+
+export async function addPermission(req: Request, res: Response) {
+  try {
+    const { roleId } = req.params;
+    const { permission_id } = req.body;
+    const { error } = await supabaseAdmin.from('role_permissions').insert({ role_id: roleId, permission_id });
+    if (error) throw error;
+    res.json({ success: true, data: { message: 'Permission added' } });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'ADD_FAILED', message: err.message } });
+  }
+}
+
+export async function removePermission(req: Request, res: Response) {
+  try {
+    const { roleId, permId } = req.params;
+    const { error } = await supabaseAdmin.from('role_permissions').delete().eq('role_id', roleId).eq('permission_id', permId);
+    if (error) throw error;
+    res.json({ success: true, data: { message: 'Permission removed' } });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'REMOVE_FAILED', message: err.message } });
+  }
+}
+
+// --- CRM ---
+export async function listClients(req: Request, res: Response) {
+  try {
+    const { search, status, page = '1', limit = '30' } = req.query;
+    const from = (parseInt(page as string) - 1) * parseInt(limit as string);
+    const to = from + parseInt(limit as string) - 1;
+    
+    let query = supabaseAdmin.from('clients').select('*', { count: 'exact' }).order('created_at', { ascending: false }).range(from, to);
+    if (search) query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
+    if (status) query = query.eq('status', status);
+    
+    const { data, error, count } = await query;
+    if (error) throw error;
+    res.json({ success: true, data: data || [], meta: { page: parseInt(page as string), limit: parseInt(limit as string), total: count || 0 } });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: { code: 'FETCH_FAILED', message: err.message } });
+  }
+}
+
+export async function createClient(req: Request, res: Response) {
+  try {
+    const { data, error } = await supabaseAdmin.from('clients').insert(req.body).select('*').single();
+    if (error) throw error;
+    res.status(201).json({ success: true, data });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'CREATE_FAILED', message: err.message } });
+  }
+}
+
+export async function updateClient(req: Request, res: Response) {
+  try {
+    const { data, error } = await supabaseAdmin.from('clients').update({ ...req.body, updated_at: new Date().toISOString() }).eq('id', req.params.id as string).select('*').single();
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'UPDATE_FAILED', message: err.message } });
+  }
+}
+
+export async function getClient(req: Request, res: Response) {
+  try {
+    const { data, error } = await supabaseAdmin.from('clients').select('*').eq('id', req.params.id as string).single();
+    if (error || !data) { res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Client not found' } }); return; }
+    res.json({ success: true, data });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: { code: 'FETCH_FAILED', message: err.message } });
+  }
+}
+
+export async function deleteClient(req: Request, res: Response) {
+  try {
+    const { error } = await supabaseAdmin.from('clients').delete().eq('id', req.params.id as string);
+    if (error) throw error;
+    res.json({ success: true, data: { message: 'Client deleted' } });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'DELETE_FAILED', message: err.message } });
+  }
+}
+
+export async function importClients(req: Request, res: Response) {
+  try {
+    const { records } = req.body;
+    if (!records || !Array.isArray(records)) {
+      res.status(400).json({ success: false, error: { code: 'INVALID_DATA', message: 'records array required' } });
+      return;
+    }
+    const batch = records.map((r: any) => ({ ...r, created_at: new Date().toISOString() }));
+    const { error } = await supabaseAdmin.from('clients').insert(batch);
+    if (error) throw error;
+    res.json({ success: true, data: { imported: batch.length } });
+  } catch (err: any) {
+    res.status(400).json({ success: false, error: { code: 'IMPORT_FAILED', message: err.message } });
   }
 }

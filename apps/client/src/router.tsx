@@ -8,6 +8,7 @@ import { TraderPage } from './pages/trader/TraderPage';
 import { LiveTradersPage } from './pages/live-traders/LiveTradersPage';
 import { AccountsPage } from './pages/accounts/AccountsPage';
 import { AISettingsPage } from './pages/settings/AISettingsPage';
+import { KYCPage } from './pages/settings/KYCPage';
 
 export function AppRouter() {
   return (
@@ -24,6 +25,7 @@ export function AppRouter() {
           <Route path="/live-traders" element={<LiveTradersPage />} />
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/ai-settings" element={<AISettingsPage />} />
+          <Route path="/kyc" element={<KYCPage />} />
         </Route>
       </Route>
 

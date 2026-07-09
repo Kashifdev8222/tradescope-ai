@@ -39,3 +39,19 @@ adminRoutes.get('/ai/stats', adminController.getAIStats);
 
 // Audit log
 adminRoutes.get('/audit-log', adminController.getAuditLog);
+
+// RBAC routes
+adminRoutes.get('/roles', adminController.listRoles);
+adminRoutes.get('/permissions', adminController.listPermissions);
+adminRoutes.post('/roles/:roleId/permissions', adminController.addPermission);
+adminRoutes.delete('/roles/:roleId/permissions/:permId', adminController.removePermission);
+
+// CRM routes
+adminRoutes.get("/clients", adminController.listClients);
+adminRoutes.get("/clients/:id", adminController.getClient);
+adminRoutes.post('/clients', adminController.createClient);
+adminRoutes.patch('/clients/:id', adminController.updateClient);
+adminRoutes.delete("/clients/:id", adminController.deleteClient);
+
+// Import
+adminRoutes.post('/import/clients', adminController.importClients);
