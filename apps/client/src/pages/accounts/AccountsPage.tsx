@@ -6,11 +6,13 @@ import { formatCurrency } from '@tradescope/shared-utils';
 import type { TradingAccount, Transaction } from '@tradescope/shared-types';
 
 export function AccountsPage() {
-  const [sel,setSel]=useState('');const [modal,setModal]=useState('');const [amt,setAmt]=useState('');const [dest,setDest]=useState('');const qc=useQueryClient();
+  const [sel,setSel]=useState('');const [modal,setModal]=useState('');const [amt,setAmt]=useState('');const [dest,setDest]=useState('');const [depMethod,setDepMethod]=useState('card');
+  const [transferTo,setTransferTo]=useState('');const qc=useQueryClient();
   const {data:accs}=useQuery({queryKey:['accounts'],queryFn:getAccounts});
   const {data:txData}=useQuery({queryKey:['transactions'],queryFn:()=>getTransactions({limit:30})});
-  const dm=useMutation({mutationFn:()=>createDeposit({account_id:sel,amount:parseFloat(amt)}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');}});
+  const dm=useMutation({mutationFn:()=>createDeposit({account_id:sel,amount:parseFloat(amt),source:depMethod}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');}});
   const wm=useMutation({mutationFn:()=>createWithdrawal({account_id:sel,amount:parseFloat(amt),destination:dest}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');setDest('');}});
+  const tm=useMutation({mutationFn:()=>createDeposit({account_id:transferTo,amount:parseFloat(amt),source:'transfer'}).then(()=>createWithdrawal({account_id:sel,amount:parseFloat(amt),destination:`Transfer to account ${transferTo.slice(0,8)}`})),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');setTransferTo('');}});
   const txs:Transaction[]=txData?.data||[];
 
   return (<>
@@ -22,8 +24,8 @@ export function AccountsPage() {
         {(accs||[]).map((a:TradingAccount)=><div key={a.id} onClick={()=>setSel(a.id)} className={`bg-white dark:bg-[#1C2128] border-2 rounded-2xl p-6 cursor-pointer transition-all hover:shadow-md w-full ${sel===a.id?'border-blue-500 shadow-md':'border-gray-200 dark:border-gray-800 shadow-sm'}`}>
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-bold text-gray-900 dark:text-white">{a.account_name}</h3>
-              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded mt-1 inline-block ${a.account_type==='live'?'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400':'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>{a.account_type}</span>
+              <div className="flex items-center gap-2"><h3 className="text-base font-bold text-gray-900 dark:text-white">{a.account_name}</h3><span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500">MT5</span></div>
+              <div className="flex items-center gap-2 mt-1"><span className="text-[11px] text-gray-400 font-mono">#{a.id.slice(0,8)}</span><span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${a.account_type==='live'?'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400':'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400'}`}>{a.account_type}</span></div>
             </div>
             <span className={`text-[11px] font-semibold flex items-center gap-1.5 ${a.is_active?'text-green-600':'text-red-600'}`}><span className={`w-1.5 h-1.5 rounded-full ${a.is_active?'bg-green-500':'bg-red-500'}`}/>{a.is_active?'Active':'Inactive'}</span>
           </div>
@@ -32,6 +34,7 @@ export function AccountsPage() {
               <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3"><span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Balance</span><p className="text-base font-bold text-gray-900 dark:text-white mt-0.5">{formatCurrency(a.balance)}</p></div>
               <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3"><span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Leverage</span><p className="text-base font-bold text-gray-900 dark:text-white mt-0.5">1:{a.leverage_default}</p></div>
               <button onClick={e=>{e.stopPropagation();setSel(a.id);setModal('deposit');}} className="w-full py-2.5 rounded-xl text-xs font-semibold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-500/20 hover:bg-green-100 dark:hover:bg-green-500/20 transition-all">Deposit</button>
+              <button onClick={e=>{e.stopPropagation();setSel(a.id);setModal('transfer');}} className="w-full py-2.5 rounded-xl text-xs font-semibold bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">Transfer</button>
             </div>
             <div className="space-y-3">
               <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-3"><span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Equity</span><p className="text-base font-bold text-gray-900 dark:text-white mt-0.5">{formatCurrency(a.equity)}</p></div>
@@ -67,10 +70,12 @@ export function AccountsPage() {
 
     {/* Modal */}
     {modal&&<div className="fixed inset-0 bg-black/40 z-[1000] flex items-center justify-center p-4" onClick={()=>setModal('')}><div className="bg-white dark:bg-[#1C2128] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 max-w-[380px] w-full shadow-2xl" onClick={e=>e.stopPropagation()}>
-      <h4 className="text-base font-bold text-gray-900 dark:text-white mb-4">{modal==='deposit'?'Deposit Funds':'Withdraw Funds'}</h4>
+      <h4 className="text-base font-bold text-gray-900 dark:text-white mb-4">{modal==='deposit'?'Deposit Funds':modal==='withdraw'?'Withdraw Funds':'Transfer Funds'}</h4>
+      {modal==='deposit'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Method</label><div className="flex gap-2">{[{k:'card',l:'💳 Card'},{k:'bank',l:'🏦 Bank'},{k:'crypto',l:'₿ Crypto'}].map(m=><button key={m.k} onClick={()=>setDepMethod(m.k)} className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${depMethod===m.k?'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400':'bg-gray-50 dark:bg-[#161B22] border-gray-200 dark:border-gray-700 text-gray-500'}`}>{m.l}</button>)}</div></div>}
       <div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Amount (USD)</label><input type="number" value={amt} onChange={e=>setAmt(e.target.value)} className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-sans outline-none focus:border-blue-500" /></div>
       {modal==='withdraw'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Destination</label><input type="text" value={dest} onChange={e=>setDest(e.target.value)} placeholder="Bank account / wallet address" className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-sans outline-none focus:border-blue-500" /></div>}
-      <div className="flex gap-2"><button onClick={()=>setModal('')} className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500">Cancel</button><button onClick={()=>modal==='deposit'?dm.mutate():wm.mutate()} className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700">{modal==='deposit'?'Deposit':'Withdraw'}</button></div>
+      {modal==='transfer'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Transfer To</label><select value={transferTo} onChange={e=>setTransferTo(e.target.value)} className="w-full px-3 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white outline-none font-sans"><option value="">Select account...</option>{(accs||[]).filter((a2:any)=>a2.id!==sel).map((a2:any)=><option key={a2.id} value={a2.id}>{a2.account_name} — {formatCurrency(a2.balance)}</option>)}</select></div>}
+      <div className="flex gap-2"><button onClick={()=>setModal('')} className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500">Cancel</button><button onClick={()=>modal==='deposit'?dm.mutate():modal==='withdraw'?wm.mutate():tm.mutate()} className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700">{modal==='deposit'?'Deposit':modal==='withdraw'?'Withdraw':'Transfer'}</button></div>
     </div></div>}
   </>);
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getQuotes, getCandles } from '../../api/market';
 import { getAccounts } from '../../api/accounts';
-import { getTrades, placeTrade, closeTrade } from '../../api/trades';
+import { getTrades, placeTrade, closeTrade, updateTradeSLTP } from '../../api/trades';
 import { TradingChart } from '../../components/trading/TradingChart';
 import { Watchlist } from '../../components/trading/Watchlist';
 import { OrderTicket } from '../../components/trading/OrderTicket';
@@ -73,8 +73,8 @@ export function TraderPage() {
                   <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{t.entry_price}</td>
                   <td className="px-4 py-2 text-gray-600 dark:text-gray-400">{t.current_price||'-'}</td>
                   <td className={`px-4 py-2 font-semibold font-mono ${pnl>=0?'text-green-600':'text-red-600'}`}>{pnl>=0?'+':''}{formatCurrency(pnl)}</td>
-                  <td className="px-4 py-2 text-gray-400">{t.stop_loss||'-'}</td>
-                  <td className="px-4 py-2 text-gray-400">{t.take_profit||'-'}</td>
+                  <td className="px-4 py-2">{tab==='open'?<input type="number" defaultValue={t.stop_loss||''} placeholder="SL" step="0.0001" className="w-16 px-1 py-0.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded text-[11px] text-gray-900 dark:text-white font-mono outline-none focus:border-blue-500" onBlur={e=>{const v=parseFloat(e.target.value);if(v)updateTradeSLTP(t.id,v,t.take_profit||undefined).then(()=>qc.invalidateQueries({queryKey:['trades']}));}}/>:<span className="text-gray-400">{t.stop_loss||'-'}</span>}</td>
+                  <td className="px-4 py-2">{tab==='open'?<input type="number" defaultValue={t.take_profit||''} placeholder="TP" step="0.0001" className="w-16 px-1 py-0.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded text-[11px] text-gray-900 dark:text-white font-mono outline-none focus:border-blue-500" onBlur={e=>{const v=parseFloat(e.target.value);if(v)updateTradeSLTP(t.id,t.stop_loss||undefined,v).then(()=>qc.invalidateQueries({queryKey:['trades']}));}}/>:<span className="text-gray-400">{t.take_profit||'-'}</span>}</td>
                   <td className="px-4 py-2">{tab==='open'&&<button onClick={()=>cm.mutate(t.id)} className="text-[10px] font-semibold px-2 py-1 rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/20 transition-all">Close</button>}</td>
                 </tr>;
               })}

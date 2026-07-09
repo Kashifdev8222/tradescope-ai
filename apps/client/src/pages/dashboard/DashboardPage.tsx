@@ -5,10 +5,12 @@ import { getAISignals } from '../../api/ai';
 import { getNewsFeed } from '../../api/news';
 import { formatCurrency, formatPercent, formatPnL } from '@tradescope/shared-utils';
 import { useAuthStore } from '../../stores/authStore';
+import { useNavigate } from 'react-router';
 import type { Trade } from '@tradescope/shared-types';
 
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
   const { data: pf } = useQuery({ queryKey: ['portfolio'], queryFn: getPortfolioSummary, refetchInterval: 10_000 });
   const { data: td } = useQuery({ queryKey: ['trades', 'open'], queryFn: () => getTrades({ status: 'open', limit: 10 }), refetchInterval: 5_000 });
   const { data: sg } = useQuery({ queryKey: ['signals'], queryFn: () => getAISignals({ limit: 8 }), refetchInterval: 8_000 });
@@ -33,6 +35,16 @@ export function DashboardPage() {
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-xs font-semibold text-green-700 dark:text-green-400">AI Engine Live</span>
         </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-4 gap-3">
+        {[
+          {label:'Deposit',icon:'💰',path:'/accounts',color:'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20'},
+          {label:'Withdraw',icon:'💳',path:'/accounts',color:'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20'},
+          {label:'Transfer',icon:'↔️',path:'/accounts',color:'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20'},
+          {label:'Trade',icon:'📈',path:'/trader',color:'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20'},
+        ].map(a=><button key={a.label} onClick={()=>navigate(a.path)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all hover:shadow-md ${a.color}`}><span className="text-2xl">{a.icon}</span><span className="text-xs font-semibold">{a.label}</span></button>)}
       </div>
 
       {/* Stats Row + Daily Goal */}
