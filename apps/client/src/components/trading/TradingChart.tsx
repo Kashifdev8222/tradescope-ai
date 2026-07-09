@@ -67,11 +67,11 @@ export function TradingChart({ candles, quote, timeframe = '1m', onTimeframeChan
     seriesRef.current = series;
 
     // SMA-20 line
-    const sma = chart.addLineSeries({ color: '#F59E0B', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+    const sma = chart.addLineSeries({ color: '#F59E0B', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     smaRef.current = sma;
 
     // EMA-50 line
-    const ema = chart.addLineSeries({ color: '#8B5CF6', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: false });
+    const ema = chart.addLineSeries({ color: '#8B5CF6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     emaRef.current = ema;
 
     chartRef.current = chart;
