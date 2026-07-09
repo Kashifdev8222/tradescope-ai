@@ -1,0 +1,58 @@
+services:
+  # Backend API
+  - type: web
+    name: tradescope-api
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: pnpm install && pnpm --filter @tradescope/api build
+    startCommand: pnpm --filter @tradescope/api start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: CLIENT_URL
+        value: https://tradescope-client.onrender.com
+      - key: ADMIN_URL
+        value: https://tradescope-admin.onrender.com
+
+  # Client App (User-facing)
+  - type: static
+    name: tradescope-client
+    buildCommand: pnpm install && pnpm --filter @tradescope/client build
+    staticPublishPath: apps/client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://tradescope-api.onrender.com/api/v1
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+
+  # Admin App
+  - type: static
+    name: tradescope-admin
+    buildCommand: pnpm install && pnpm --filter @tradescope/admin build
+    staticPublishPath: apps/admin/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://tradescope-api.onrender.com/api/v1
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false

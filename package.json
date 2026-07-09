@@ -1,0 +1,27 @@
+{
+  "name": "tradescope-ai",
+  "private": true,
+  "packageManager": "pnpm@11.10.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "dev:api": "pnpm --filter @tradescope/api dev",
+    "dev:client": "pnpm --filter @tradescope/client dev",
+    "dev:admin": "pnpm --filter @tradescope/admin dev",
+    "db:migrate": "pnpm --filter @tradescope/api db:migrate"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
