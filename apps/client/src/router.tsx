@@ -9,6 +9,8 @@ import { LiveTradersPage } from './pages/live-traders/LiveTradersPage';
 import { AccountsPage } from './pages/accounts/AccountsPage';
 import { AISettingsPage } from './pages/settings/AISettingsPage';
 import { KYCPage } from './pages/settings/KYCPage';
+import { CallPage } from './pages/settings/CallPage';
+import { ProfilePage } from './pages/settings/ProfilePage';
 
 export function AppRouter() {
   return (
@@ -26,6 +28,8 @@ export function AppRouter() {
           <Route path="/accounts" element={<AccountsPage />} />
           <Route path="/ai-settings" element={<AISettingsPage />} />
           <Route path="/kyc" element={<KYCPage />} />
+          <Route path="/call" element={<CallPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
 
