@@ -16,7 +16,7 @@ export function AISettingsPage() {
       {/* Risk Level */}
       <div className="bg-white dark:bg-[#1C2128] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Risk Profile</h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[{v:'conservative',l:'Conservative',c:'#059669',d:'Low risk, steady returns'},{v:'moderate',l:'Moderate',c:'#D97706',d:'Balanced risk/reward'},{v:'aggressive',l:'Aggressive',c:'#DC2626',d:'High risk, high potential'}].map(lv=>(
             <button key={lv.v} onClick={()=>setRl(lv.v)} className={`p-4 rounded-xl border-2 text-center transition-all ${rl===lv.v?'bg-white dark:bg-[#0D1117] shadow-sm':'bg-gray-50 dark:bg-[#161B22] border-transparent hover:border-gray-300'}`} style={{borderColor:rl===lv.v?lv.c:'transparent'}}>
               <div className="w-3 h-3 rounded-full mx-auto mb-2" style={{background:lv.c}}/>

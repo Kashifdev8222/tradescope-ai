@@ -27,7 +27,7 @@ export function AIControlPage() {
       {/* Emergency Stop */}
       <div className={`bg-white dark:bg-[#1C2128] border-2 rounded-2xl p-6 shadow-sm ${stopped?'border-red-500 bg-red-50/50 dark:bg-red-500/5':''}`}>
         <div className="flex items-center justify-between"><div><h3 className={`text-base font-bold ${stopped?'text-red-600':''}`}>{stopped?'⚠️ EMERGENCY STOP ACTIVE':'🟢 AI Trading Active'}</h3><p className="text-xs text-gray-500 mt-0.5">{stopped?'All AI trading halted globally.':'AI engine running normally.'}</p></div>
-        {stopped?<button onClick={()=>resume.mutate()} className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold">▶ Resume AI</button>:<button onClick={()=>stop.mutate()} className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold">⏹ EMERGENCY STOP</button>}</div>
+        {stopped?<button onClick={()=>resume.mutate()} className="px-6 py-2.5 whitespace-nowrap whitespace-nowrap bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold">▶ Resume AI</button>:<button onClick={()=>stop.mutate()} className="px-6 py-2.5 whitespace-nowrap whitespace-nowrap bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold">⏹ EMERGENCY STOP</button>}</div>
       </div>
 
       {/* Stats */}
@@ -44,7 +44,7 @@ export function AIControlPage() {
           <div><label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Stop Loss: {sl}%</label><input type="range" min={0.5} max={10} step={0.5} value={sl} onChange={e=>setSl(+e.target.value)} className="w-full mt-2 accent-red-500"/></div>
           <div><label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Take Profit: {tp}%</label><input type="range" min={1} max={30} step={0.5} value={tp} onChange={e=>setTp(+e.target.value)} className="w-full mt-2 accent-green-500"/></div>
         </div>
-        <button onClick={()=>um.mutate()} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold">Save Parameters</button>
+        <button onClick={()=>um.mutate()} className="px-5 py-2 whitespace-nowrap whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold">Save Parameters</button>
       </div>
 
       {/* Per-User Overrides */}
@@ -52,26 +52,26 @@ export function AIControlPage() {
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Per-User AI Overrides</h3>
 
         {/* Add Override */}
-        <div className="flex flex-wrap items-end gap-3 mb-5 p-4 bg-gray-50 dark:bg-[#161B22] rounded-xl">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-end gap-3 mb-5 p-4 bg-gray-50 dark:bg-[#161B22] rounded-xl">
           <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">User</label><select value={selUser} onChange={e=>setSelUser(e.target.value)} className="px-2.5 py-2 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"><option value="">Select user...</option>{(users||[]).map((u:any)=><option key={u.id} value={u.id}>{u.email}</option>)}</select></div>
-          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Pos Size %</label><input type="number" value={oPs} onChange={e=>setOPs(e.target.value)} placeholder="-" className="w-20 px-2 py-2 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
-          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Daily Trades</label><input type="number" value={oDt} onChange={e=>setODt(e.target.value)} placeholder="-" className="w-20 px-2 py-2 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
-          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">SL %</label><input type="number" value={oSl} onChange={e=>setOSl(e.target.value)} placeholder="-" step="0.5" className="w-16 px-2 py-2 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
-          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">TP %</label><input type="number" value={oTp} onChange={e=>setOTp(e.target.value)} placeholder="-" step="0.5" className="w-16 px-2 py-2 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
-          <button onClick={()=>ovm.mutate()} disabled={!selUser||ovm.isPending} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold">Set Override</button>
+          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Pos Size %</label><input type="number" value={oPs} onChange={e=>setOPs(e.target.value)} placeholder="-" className="w-20 px-2 py-2 whitespace-nowrap bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
+          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Daily Trades</label><input type="number" value={oDt} onChange={e=>setODt(e.target.value)} placeholder="-" className="w-20 px-2 py-2 whitespace-nowrap bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
+          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">SL %</label><input type="number" value={oSl} onChange={e=>setOSl(e.target.value)} placeholder="-" step="0.5" className="w-16 px-2 py-2 whitespace-nowrap bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
+          <div><label className="block text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">TP %</label><input type="number" value={oTp} onChange={e=>setOTp(e.target.value)} placeholder="-" step="0.5" className="w-16 px-2 py-2 whitespace-nowrap bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans"/></div>
+          <button onClick={()=>ovm.mutate()} disabled={!selUser||ovm.isPending} className="px-4 py-2 whitespace-nowrap whitespace-nowrap bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold">Set Override</button>
         </div>
 
         {/* Existing Overrides */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs"><thead><tr className="border-b border-gray-100 dark:border-gray-800">{['User','Position Size','Daily Trades','Stop Loss','Take Profit','Action'].map(h=><th key={h} className="px-4 py-2.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{h}</th>)}</tr></thead>
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full min-w-[600px] sm:min-w-0 text-left text-xs"><thead><tr className="border-b border-gray-100 dark:border-gray-800">{['User','Position Size','Daily Trades','Stop Loss','Take Profit','Action'].map(h=><th key={h} className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{h}</th>)}</tr></thead>
           <tbody>
             {(overrides||[]).map((o:any)=><tr key={o.id} className="border-b border-gray-50 dark:border-gray-800/50">
-              <td className="px-4 py-2.5 font-semibold text-gray-900 dark:text-white text-[12px]">{(users||[]).find((u:any)=>u.id===o.user_id)?.email||o.user_id?.slice(0,8)}</td>
-              <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{o.max_position_size||'—'}</td>
-              <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{o.max_daily_trades||'—'}</td>
-              <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{o.stop_loss_pct||'—'}</td>
-              <td className="px-4 py-2.5 text-gray-600 dark:text-gray-400">{o.take_profit_pct||'—'}</td>
-              <td className="px-4 py-2.5"><button onClick={()=>rmv.mutate(o.user_id)} className="text-[10px] font-semibold text-red-600 hover:text-red-700">Remove</button></td>
+              <td className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap font-semibold text-gray-900 dark:text-white text-[12px]">{(users||[]).find((u:any)=>u.id===o.user_id)?.email||o.user_id?.slice(0,8)}</td>
+              <td className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap text-gray-600 dark:text-gray-400">{o.max_position_size||'—'}</td>
+              <td className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap text-gray-600 dark:text-gray-400">{o.max_daily_trades||'—'}</td>
+              <td className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap text-gray-600 dark:text-gray-400">{o.stop_loss_pct||'—'}</td>
+              <td className="px-4 py-2.5 whitespace-nowrap whitespace-nowrap text-gray-600 dark:text-gray-400">{o.take_profit_pct||'—'}</td>
+              <td className="px-4 py-2.5 whitespace-nowrap"><button onClick={()=>rmv.mutate(o.user_id)} className="text-[10px] font-semibold text-red-600 hover:text-red-700">Remove</button></td>
             </tr>)}
           </tbody></table>
           {(!overrides||!overrides.length)&&<div className="text-center py-6 text-xs text-gray-400">No user overrides set</div>}

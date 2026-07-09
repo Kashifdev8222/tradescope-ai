@@ -20,7 +20,7 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
   if (!quote) return null;
 
   return (<>
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-white dark:bg-[#1C2128] border-t-2 border-blue-500 dark:border-blue-600 flex-shrink-0 overflow-x-auto">
+    <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 bg-white dark:bg-[#1C2128] border-t-2 border-blue-500 dark:border-blue-600 flex-shrink-0 overflow-x-auto">
       {/* Symbol + Spread */}
       <div className="flex items-center gap-2 shrink-0">
         <span className="text-sm font-bold text-gray-900 dark:text-white">{quote.symbol}</span>
@@ -29,7 +29,7 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
         <span className="text-xs text-green-500">A {quote.ask.toFixed(4)}</span>
       </div>
 
-      <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+      <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
 
       {/* Order type */}
       <div className="flex gap-0.5 shrink-0">
@@ -38,7 +38,7 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
         ))}
       </div>
 
-      <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+      <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
 
       {/* Buy/Sell */}
       <div className="flex gap-1.5 shrink-0">
@@ -46,7 +46,7 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
         <button onClick={() => setSide('sell')} className={`px-3 py-1 rounded text-xs font-bold transition-all ${side==='sell'?'bg-red-600 text-white':'bg-white dark:bg-[#0D1117] text-gray-400 border border-gray-200 dark:border-gray-700'}`}>Sell</button>
       </div>
 
-      <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+      <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
 
       {/* Qty */}
       <div className="flex items-center gap-1.5 shrink-0">
@@ -57,14 +57,14 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
 
       {/* Price (limit/stop) */}
       {type !== 'market' && <>
-        <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+        <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">{type==='limit'?'Limit':'Stop'}</span>
           <input type="number" value={price} onChange={e => setPrice(e.target.value)} step="0.0001" className="w-20 px-1.5 py-1 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-gray-900 dark:text-white outline-none focus:border-blue-500" />
         </div>
       </>}
 
-      <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+      <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
 
       {/* SL / TP */}
       <div className="flex items-center gap-1.5 shrink-0">

@@ -38,13 +38,13 @@ export function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          {label:'Deposit',icon:'💰',path:'/accounts',color:'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20'},
-          {label:'Withdraw',icon:'💳',path:'/accounts',color:'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20'},
-          {label:'Transfer',icon:'↔️',path:'/accounts',color:'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20'},
-          {label:'Trade',icon:'📈',path:'/trader',color:'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20'},
-        ].map(a=><button key={a.label} onClick={()=>navigate(a.path)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all hover:shadow-md ${a.color}`}><span className="text-2xl">{a.icon}</span><span className="text-xs font-semibold">{a.label}</span></button>)}
+          {label:'Deposit',path:'/accounts',color:'bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/20', svg:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>},
+          {label:'Withdraw',path:'/accounts',color:'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/20', svg:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>},
+          {label:'Transfer',path:'/accounts',color:'bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-500/20', svg:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>},
+          {label:'Trade',path:'/trader',color:'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-500/20', svg:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>},
+        ].map(a=><button key={a.label} onClick={()=>navigate(a.path)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all hover:shadow-md ${a.color}`}><span className="shrink-0">{a.svg}</span><span className="text-xs font-semibold">{a.label}</span></button>)}
       </div>
 
       {/* Stats Row + Daily Goal */}
