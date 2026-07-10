@@ -1,8 +1,6 @@
 import cors from 'cors';
 import { config } from './index.js';
 
-import { config } from './index.js';
-
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
