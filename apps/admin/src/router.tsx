@@ -12,6 +12,8 @@ import { ClientsPage } from './pages/users/ClientsPage';
 import { KYCPage } from './pages/users/KYCPage';
 import { ImportPage } from './pages/users/ImportPage';
 import { AdminCallPage } from './pages/users/AdminCallPage';
+import { WorkspacePage } from './pages/users/WorkspacePage';
+import { ReportsPage } from './pages/reports/ReportsPage';
 
 export function AppRouter() {
   return (
@@ -26,6 +28,8 @@ export function AppRouter() {
           <Route path="/admin/kyc" element={<KYCPage />} />
           <Route path="/admin/import" element={<ImportPage />} />
           <Route path="/admin/call" element={<AdminCallPage />} />
+          <Route path="/admin/workspace" element={<WorkspacePage />} />
+          <Route path="/admin/reports" element={<ReportsPage />} />
           <Route path="/admin/balances" element={<BalancesPage />} />
           <Route path="/admin/transactions" element={<TransactionsPage />} />
           <Route path="/admin/ai-control" element={<AIControlPage />} />

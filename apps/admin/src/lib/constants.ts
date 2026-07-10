@@ -1,11 +1,13 @@
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000/api/v1';
 
 export const ADMIN_NAV_ITEMS = [
+  { label: 'Workspace', path: '/admin/workspace', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M3 3h7v7H3V3z','M14 3h7v7h-7V3z','M14 14h7v7h-7v-7z','M3 14h7v7H3v-7z'] },
   { label: 'Users', path: '/admin/users', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2','M23 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'], circle: '9 7 4' },
   { label: 'Clients', path: '/admin/clients', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2','M23 21v-2a4 4 0 0 0-3-3.87','M16 3.13a4 4 0 0 1 0 7.75'], circle: '9 7 4' },
   { label: 'Balances', path: '/admin/balances', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M21 12V7H5a2 2 0 0 1 0-4h14v4','M3 5v14a2 2 0 0 0 2 2h16v-5','M18 12a2 2 0 0 0 0 4h4v-4Z'] },
   { label: 'Transactions', path: '/admin/transactions', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z','M14 2v6h6','M16 13H8','M16 17H8','M10 9H8'] },
   { label: 'AI Control', path: '/admin/ai-control', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z'], circle: '12 11 3' },
+  { label: 'Reports', path: '/admin/reports', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M18 20V10','M12 20V4','M6 20v-6'] },
   { label: 'Import', path: '/admin/import', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4','M7 10l5 5 5-5','M12 15V3'] },
   { label: 'Call', path: '/admin/call', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'] },
   { label: 'KYC', path: '/admin/kyc', viewBox: '0 0 24 24', stroke: 'currentColor', paths: ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z','M14 2v6h6','M16 13H8','M16 17H8','M10 9H8'], circle: '' },

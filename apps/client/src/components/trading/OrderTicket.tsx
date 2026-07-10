@@ -8,6 +8,7 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
   const [price, setPrice] = useState('');
   const [sl, setSl] = useState('');
   const [tp, setTp] = useState('');
+  const [expiry, setExpiry] = useState<'GTC' | 'IOC' | 'FOK'>('GTC');
   const [arm, setArm] = useState(() => localStorage.getItem('armMode') === 'true');
   const [confirm, setConfirm] = useState(false);
   const [err, setErr] = useState('');
@@ -72,6 +73,17 @@ export function OrderTicket({ quote, onPlaceOrder }: { quote: MarketQuote | null
         <input type="number" value={sl} onChange={e => setSl(e.target.value)} placeholder="-" className="w-16 px-1.5 py-1 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-gray-900 dark:text-white outline-none focus:border-blue-500" />
         <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">TP</span>
         <input type="number" value={tp} onChange={e => setTp(e.target.value)} placeholder="-" className="w-16 px-1.5 py-1 bg-white dark:bg-[#0D1117] border border-gray-200 dark:border-gray-700 rounded text-xs font-mono text-gray-900 dark:text-white outline-none focus:border-blue-500" />
+      </div>
+
+      {/* Order Expiry */}
+      <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-gray-700 shrink-0" />
+      <div className="flex items-center gap-1.5 shrink-0">
+        <span className="text-xs text-gray-400 uppercase tracking-wider font-semibold">TIF</span>
+        <div className="flex gap-0.5">
+          {(['GTC','IOC','FOK'] as const).map(e => (
+            <button key={e} onClick={() => setExpiry(e)} className={`px-2 py-1 text-xs font-semibold rounded transition-all ${expiry===e?'bg-blue-600 text-white':'text-gray-400 dark:text-gray-500 hover:text-gray-600 border border-gray-200 dark:border-gray-700'}`}>{e}</button>
+          ))}
+        </div>
       </div>
 
       {/* ARM + Submit */}

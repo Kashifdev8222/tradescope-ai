@@ -36,6 +36,8 @@ export function TradingChart({ candles, quote, timeframe = '1m', onTimeframeChan
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
   const smaRef = useRef<ISeriesApi<'Line'> | null>(null);
   const emaRef = useRef<ISeriesApi<'Line'> | null>(null);
+  const bidRef = useRef<ISeriesApi<'Line'> | null>(null);
+  const askRef = useRef<ISeriesApi<'Line'> | null>(null);
   const [seconds, setSeconds] = useState(0);
 
   // Countdown timer
@@ -74,6 +76,14 @@ export function TradingChart({ candles, quote, timeframe = '1m', onTimeframeChan
     const ema = chart.addLineSeries({ color: '#8B5CF6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     emaRef.current = ema;
 
+    // Bid line (dotted green)
+    const bidLine = chart.addLineSeries({ color: '#22C55E', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false });
+    bidRef.current = bidLine;
+
+    // Ask line (dotted red)
+    const askLine = chart.addLineSeries({ color: '#EF4444', lineWidth: 1, lineStyle: 2, priceLineVisible: false, lastValueVisible: false });
+    askRef.current = askLine;
+
     chartRef.current = chart;
 
     const ro = new ResizeObserver(es => { for (const e of es) { const { width: w, height: h } = e.contentRect; if (w > 0 && h > 0) try { chart.applyOptions({ width: w, height: h }); } catch {} } });
@@ -90,6 +100,21 @@ export function TradingChart({ candles, quote, timeframe = '1m', onTimeframeChan
     smaRef.current.setData(calcSMA(candles, 20));
     emaRef.current.setData(calcEMA(candles, 50));
   }, [candles]);
+
+  // Update bid/ask spread lines
+  useEffect(() => {
+    if (!quote || !bidRef.current || !askRef.current || !candles.length) return;
+    const firstTime = candles[0]!.time;
+    const lastTime = candles[candles.length - 1]!.time;
+    bidRef.current.setData([
+      { time: firstTime as Time, value: quote.bid },
+      { time: lastTime as Time, value: quote.bid },
+    ]);
+    askRef.current.setData([
+      { time: firstTime as Time, value: quote.ask },
+      { time: lastTime as Time, value: quote.ask },
+    ]);
+  }, [quote, candles.length > 0 ? candles[0]?.time : null, candles.length > 0 ? candles[candles.length - 1]?.time : null]);
 
   const fmtCountdown = () => `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
 

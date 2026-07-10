@@ -55,3 +55,17 @@ adminRoutes.delete("/clients/:id", adminController.deleteClient);
 
 // Import
 adminRoutes.post('/import/clients', adminController.importClients);
+
+// Agent Workspace
+adminRoutes.get('/agent/tasks', adminController.listAgentTasks);
+adminRoutes.post('/agent/tasks', adminController.createAgentTask);
+adminRoutes.patch('/agent/tasks/:id', adminController.updateAgentTask);
+adminRoutes.delete('/agent/tasks/:id', adminController.deleteAgentTask);
+adminRoutes.get('/agent/stats', adminController.getAgentStats);
+
+// Reports
+adminRoutes.get('/reports/funnel', adminController.getFunnelReport);
+adminRoutes.get('/reports/kpi', adminController.getKPIReport);
+
+// Duplicate detection
+adminRoutes.post('/clients/check-duplicate', adminController.checkDuplicate);
