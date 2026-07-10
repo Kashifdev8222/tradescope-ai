@@ -11,11 +11,10 @@ const allowedOrigins = [
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (server-to-server, curl, mobile apps)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.some((allowed) => origin.startsWith(allowed))) {
+    if (!origin || allowedOrigins.some((allowed) => origin.startsWith(allowed))) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      callback(null, false);
     }
   },
   credentials: true,
