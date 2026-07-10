@@ -47,7 +47,12 @@ export async function listAll(_req: Request, res: Response) {
 
 export async function deleteDoc(req: Request, res: Response) {
   try {
-    const { error } = await supabaseAdmin.from('kyc_documents').delete().eq('id', req.params.id as string).eq('user_id', req.user!.id);
+    let query = supabaseAdmin.from('kyc_documents').delete().eq('id', req.params.id as string);
+    // Regular users can only delete their own documents; admins can delete any
+    if (req.user?.role !== 'admin') {
+      query = query.eq('user_id', req.user!.id);
+    }
+    const { error } = await query;
     if (error) throw error;
     res.json({ success: true, data: { message: 'Document deleted' } });
   } catch (err: any) {
