@@ -10,13 +10,16 @@ import { formatCurrency } from '@tradescope/shared-utils';
 import type { Trade } from '@tradescope/shared-types';
 
 export function TraderPage() {
-  const [sel,setSel]=useState('EUR/USD');const [tf,setTf]=useState('1m');const [tab,setTab]=useState<'open'|'pending'|'history'>('open');const qc=useQueryClient();
-  const {data:accs}=useQuery({queryKey:['accounts'],queryFn:getAccounts});const a=accs?.[0];
+  const [sel,setSel]=useState('EUR/USD');const [tf,setTf]=useState('1m');const [tab,setTab]=useState<'open'|'pending'|'history'>('open');const [acctId,setAcctId]=useState('');const qc=useQueryClient();
+  const {data:accs}=useQuery({queryKey:['accounts'],queryFn:getAccounts});
+  const a=accs?.find(x=>x.id===acctId)||accs?.[0];
+  // Sync selected account when accounts load
+  if(accs?.length && !acctId) setAcctId(accs[0]!.id);
   const {data:quotes=[]}=useQuery({queryKey:['quotes'],queryFn:()=>getQuotes(),refetchInterval:1000});const q=quotes.find(x=>x.symbol===sel)||null;
   const {data:candles=[]}=useQuery({queryKey:['candles',sel,tf],queryFn:()=>getCandles(sel,tf,500),refetchInterval:1000});
   const {data:tData}=useQuery({queryKey:['trades','all'],queryFn:()=>getTrades({status:'all',limit:50}),refetchInterval:2000});
   const all:Trade[]=tData?.data||[];const open=all.filter(t=>t.status==='open');const pending=all.filter(t=>t.status==='pending');const closed=all.filter(t=>t.status==='closed');
-  const pm=useMutation({mutationFn:(o:any)=>placeTrade({account_id:a?.id||'',symbol:o.symbol,side:o.side,quantity:o.quantity,stop_loss:o.sl,take_profit:o.tp,source:'manual'}),onSuccess:()=>qc.invalidateQueries({queryKey:['trades']})});
+  const pm=useMutation({mutationFn:(o:any)=>placeTrade({account_id:acctId||a?.id||'',symbol:o.symbol,side:o.side,quantity:o.quantity,stop_loss:o.sl,take_profit:o.tp,source:'manual'}),onSuccess:()=>qc.invalidateQueries({queryKey:['trades']})});
   const cm=useMutation({mutationFn:(id:string)=>closeTrade(id,q?.price||0),onSuccess:()=>qc.invalidateQueries({queryKey:['trades']})});
   const bal=Number(a?.balance||0),eq=Number(a?.equity||0),mar=Number(a?.margin_used||0),free=eq-mar,lvl=mar>0?(eq/mar)*100:0;
   const rows=tab==='open'?open:tab==='pending'?pending:closed.slice(0,30);
@@ -27,7 +30,14 @@ export function TraderPage() {
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Web Trader</h2>
         <p className="text-xs text-gray-500 dark:text-gray-400">Professional trading terminal</p>
       </div>
-      {q && <div className="flex items-center gap-2 text-xs"><span className="px-2.5 py-1 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-full font-semibold border border-green-200 dark:border-green-500/20">● Live</span></div>}
+      <div className="flex items-center gap-3">
+        {(accs?.length || 0) > 1 && (
+          <select value={acctId||a?.id||''} onChange={e=>setAcctId(e.target.value)} className="px-3 py-1.5 bg-white dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-lg text-xs text-gray-900 dark:text-white outline-none font-sans">
+            {accs?.map(ac=><option key={ac.id} value={ac.id}>{ac.account_name} — {ac.account_type?.toUpperCase()} ({formatCurrency(ac.balance)})</option>)}
+          </select>
+        )}
+        {q && <div className="flex items-center gap-2 text-xs"><span className="px-2.5 py-1 bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 rounded-full font-semibold border border-green-200 dark:border-green-500/20">● Live</span></div>}
+      </div>
     </div>
     <div className="flex flex-col bg-white dark:bg-[#0D1117] rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm lg:h-[calc(100vh-180px)]" style={{minHeight:'600px'}}>
       {/* Main Trading Area — Watchlist + Chart side by side */}

@@ -130,12 +130,16 @@ export function TradingChart({ candles, quote, timeframe = '1m', onTimeframeChan
           <div className="flex items-center gap-3 text-[10px]">
             <span className="flex items-center gap-1"><span className="w-2.5 h-0.5 bg-amber-500 inline-block rounded"/>SMA 20</span>
             <span className="flex items-center gap-1"><span className="w-2.5 h-0.5 bg-purple-500 inline-block rounded"/>EMA 50</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-0.5 bg-green-500 inline-block rounded" style={{borderTop:'1px dashed #22C55E'}}/>Bid</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-0.5 bg-red-400 inline-block rounded" style={{borderTop:'1px dashed #EF4444'}}/>Ask</span>
           </div>
           {quote && (
             <div className="flex gap-3 text-[10px] font-mono">
               <span className="text-gray-400">O <b className="text-gray-900 dark:text-white">{quote.price.toFixed(quote.class==='fx'?5:2)}</b></span>
               <span className="text-gray-400">H <b className="text-green-600">{quote.high.toFixed(4)}</b></span>
               <span className="text-gray-400">L <b className="text-red-600">{quote.low.toFixed(4)}</b></span>
+              <span className="text-gray-400">B <b className="text-green-500">{quote.bid.toFixed(quote.class==='fx'?5:2)}</b></span>
+              <span className="text-gray-400">A <b className="text-red-400">{quote.ask.toFixed(quote.class==='fx'?5:2)}</b></span>
             </div>
           )}
           {/* Countdown */}

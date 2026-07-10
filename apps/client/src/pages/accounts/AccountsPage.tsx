@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAccounts } from '../../api/accounts';
+import { getAccounts, createAccount } from '../../api/accounts';
 import { getTransactions, createDeposit, createWithdrawal } from '../../api/transactions';
 import { formatCurrency } from '@tradescope/shared-utils';
 import type { TradingAccount, Transaction } from '@tradescope/shared-types';
 
 export function AccountsPage() {
   const [sel,setSel]=useState('');const [modal,setModal]=useState('');const [amt,setAmt]=useState('');const [dest,setDest]=useState('');const [depMethod,setDepMethod]=useState('card');
-  const [transferTo,setTransferTo]=useState('');const qc=useQueryClient();
+  const [transferTo,setTransferTo]=useState('');const [createName,setCreateName]=useState('');const [createType,setCreateType]=useState<'live'|'demo'>('demo');
+  const qc=useQueryClient();
   const {data:accs}=useQuery({queryKey:['accounts'],queryFn:getAccounts});
   const {data:txData}=useQuery({queryKey:['transactions'],queryFn:()=>getTransactions({limit:30})});
   const dm=useMutation({mutationFn:()=>createDeposit({account_id:sel,amount:parseFloat(amt),source:depMethod}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');}});
   const wm=useMutation({mutationFn:()=>createWithdrawal({account_id:sel,amount:parseFloat(amt),destination:dest}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');setDest('');}});
   const tm=useMutation({mutationFn:()=>createDeposit({account_id:transferTo,amount:parseFloat(amt),source:'transfer'}).then(()=>createWithdrawal({account_id:sel,amount:parseFloat(amt),destination:`Transfer to account ${transferTo.slice(0,8)}`})),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});qc.invalidateQueries({queryKey:['transactions']});setModal('');setAmt('');setTransferTo('');}});
+  const cam=useMutation({mutationFn:()=>createAccount({account_name:createName||'Trading Account',account_type:createType}),onSuccess:()=>{qc.invalidateQueries({queryKey:['accounts']});setModal('');setCreateName('');}});
   const txs:Transaction[]=txData?.data||[];
 
   return (<>
     <div className="space-y-6">
-      <div><h2 className="text-xl font-bold text-gray-900 dark:text-white">Account Management</h2><p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Manage your trading accounts and funds</p></div>
+      <div className="flex items-center justify-between"><div><h2 className="text-xl font-bold text-gray-900 dark:text-white">Account Management</h2><p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Manage your trading accounts and funds</p></div>
+      <button onClick={()=>setModal('create')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all">+ New Account</button>
+      </div>
 
       {/* Account Cards */}
       <div className="space-y-4">
@@ -70,12 +74,17 @@ export function AccountsPage() {
 
     {/* Modal */}
     {modal&&<div className="fixed inset-0 bg-black/40 z-[1000] flex items-center justify-center p-4" onClick={()=>setModal('')}><div className="bg-white dark:bg-[#1C2128] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 max-w-[380px] w-full shadow-2xl" onClick={e=>e.stopPropagation()}>
-      <h4 className="text-base font-bold text-gray-900 dark:text-white mb-4">{modal==='deposit'?'Deposit Funds':modal==='withdraw'?'Withdraw Funds':'Transfer Funds'}</h4>
+      <h4 className="text-base font-bold text-gray-900 dark:text-white mb-4">{modal==='deposit'?'Deposit Funds':modal==='withdraw'?'Withdraw Funds':modal==='transfer'?'Transfer Funds':'New Trading Account'}</h4>
+      {modal==='create'&&<>
+        <div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Account Name</label><input type="text" value={createName} onChange={e=>setCreateName(e.target.value)} placeholder="e.g. My Trading Account" className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-sans outline-none focus:border-blue-500" /></div>
+        <div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Account Type</label><div className="flex gap-2">{['live','demo'].map(t=><button key={t} onClick={()=>setCreateType(t as any)} className={`flex-1 py-2.5 rounded-xl text-xs font-semibold border-2 transition-all ${createType===t?'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400':'bg-gray-50 dark:bg-[#161B22] border-gray-200 dark:border-gray-700 text-gray-500'}`}>{t.toUpperCase()}</button>)}</div></div>
+      </>}
+      {modal!=='create'&&<>
       {modal==='deposit'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Method</label><div className="flex gap-2">{[{k:'card',l:'💳 Card'},{k:'bank',l:'🏦 Bank'},{k:'crypto',l:'₿ Crypto'}].map(m=><button key={m.k} onClick={()=>setDepMethod(m.k)} className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${depMethod===m.k?'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-400':'bg-gray-50 dark:bg-[#161B22] border-gray-200 dark:border-gray-700 text-gray-500'}`}>{m.l}</button>)}</div></div>}
       <div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Amount (USD)</label><input type="number" value={amt} onChange={e=>setAmt(e.target.value)} className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-sans outline-none focus:border-blue-500" /></div>
       {modal==='withdraw'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Destination</label><input type="text" value={dest} onChange={e=>setDest(e.target.value)} placeholder="Bank account / wallet address" className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white text-sm font-sans outline-none focus:border-blue-500" /></div>}
       {modal==='transfer'&&<div className="mb-4"><label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Transfer To</label><select value={transferTo} onChange={e=>setTransferTo(e.target.value)} className="w-full px-3 py-2.5 whitespace-nowrap bg-gray-50 dark:bg-[#161B22] border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white outline-none font-sans"><option value="">Select account...</option>{(accs||[]).filter((a2:any)=>a2.id!==sel).map((a2:any)=><option key={a2.id} value={a2.id}>{a2.account_name} — {formatCurrency(a2.balance)}</option>)}</select></div>}
-      <div className="flex gap-2"><button onClick={()=>setModal('')} className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500">Cancel</button><button onClick={()=>modal==='deposit'?dm.mutate():modal==='withdraw'?wm.mutate():tm.mutate()} className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700">{modal==='deposit'?'Deposit':modal==='withdraw'?'Withdraw':'Transfer'}</button></div>
+      <div className="flex gap-2"><button onClick={()=>setModal('')} className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-500">Cancel</button><button onClick={()=>modal==='deposit'?dm.mutate():modal==='withdraw'?wm.mutate():modal==='transfer'?tm.mutate():cam.mutate()} disabled={modal==='create'&&cam.isPending} className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50">{modal==='deposit'?'Deposit':modal==='withdraw'?'Withdraw':modal==='transfer'?'Transfer':'Create Account'}</button></div>
     </div></div>}
   </>);
 }
